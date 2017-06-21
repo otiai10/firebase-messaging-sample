@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="manifest" href="/manifest.json">
+  <script type="text/javascript" src="https://www.gstatic.com/firebasejs/3.9.0/firebase-app.js"></script>
+  <script type="text/javascript" src="https://www.gstatic.com/firebasejs/3.9.0/firebase-messaging.js"></script>
+  <script type="text/javascript" src="/main.js"></script>
+</head>
+<body>
+  <h1>Firebase Messaging Sample</h1>
+  <div>
+    <p>This button would execute (1) Request notification permission and (2) Send device token to your server.</p>
+    <button id="request-permission">Request Permission</button>
+  </div>
+  <div>
+    <p>This button send POST request to your server to trigger push notifications for targets stored on server.</p>
+    <button id="push">Trigger Push</button>
+  </div>
+  <footer style="text-align:right;">
+    <a href="https://github.com/otiai10/firebase-messaging-sample">GitHub</a>
+  </footer>
+</body>
+</html>
