@@ -1,9 +1,18 @@
 
 const main = () => {
 
-  firebase.initializeApp({
-    messagingSenderId: "{{GCM_SENDER_ID}}"
-  });
+  var firebaseConfig = {
+    apiKey: "<YOUR-PRIVATE_INFO>",
+    authDomain: "<YOUR-PRIVATE_INFO>",
+    databaseURL: "<YOUR-PRIVATE_INFO>",
+    projectId: "<YOUR-PRIVATE_INFO>",
+    storageBucket: "<YOUR-PRIVATE_INFO>",
+    messagingSenderId: "<YOUR-PRIVATE_INFO>",
+    appId: "<YOUR-PRIVATE_INFO>",
+    measurementId: "<YOUR-PRIVATE_INFO>"
+  };
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
   const messaging = firebase.messaging();
 
   messaging.onMessage(function(payload) {

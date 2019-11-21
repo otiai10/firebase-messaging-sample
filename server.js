@@ -1,7 +1,3 @@
-/**
- *
- */
-
 const http  = require("http"),
       https = require("https"),
       fs    = require("fs"),
@@ -23,8 +19,11 @@ const controllers = {
     res.end();
   },
   file: (req, res) => {
+    console.log("path: "+path);
     const ext = path.extname(req.url).replace(/^\./, "");
+    console.log("ext: "+ext);
     const fpath = path.join(".", ext, req.url);
+    console.log("fpath: "+fpath);
     if (!fs.existsSync(fpath)) return controllers.notfound(req, res);
     res.writeHead(200, {"Content-Type": mimeTypes[ext]});
     const stream = fs.createReadStream(fpath);
@@ -63,7 +62,7 @@ const controllers = {
           method:"POST", host: "fcm.googleapis.com", path: "/fcm/send",
           headers: {
             "Content-Type": "application/json",
-            "Authorization": `key=${process.env.FCM_SERVER_KEY}`,
+            "Authorization": `key=<YOUR-PRIVATE-INFO>`,
           },
         }, response => {
           resolve({});
@@ -81,25 +80,41 @@ const controllers = {
       res.end(JSON.stringify(result));
     });
   },
+  redirect: (req, res, file="./html/index.html") => {
+    fs.readFile(file, function(err,data){
+      if (err) {
+        res.writeHead(404, {
+          'content-type': 'text/html;charset=utf-8'
+        });
+        res.end('<h1>404<h1>');
+      } else {
+        res.writeHead(200, {
+          'content-type': 'text/html;charset=utf-8'
+        });
+        res.end(data);
+      }
+    });
+  }
 };
 
 const simpleserver = http.createServer((req, res) => {
   console.log(req.method, req.url);
   switch(req.url) {
-  case "/": req.url += "index.html";
-  case "/manifest.json":
-  case "/0.png": case "/1.png": case "/2.png":
-    return controllers.file(req, res);
-  case "/main.js":
-    return controllers.mainjs(req, res);
-  case "/firebase-messaging-sw.js":
-    return controllers.serviceworker(req, res);
-  case "/register":
-    return controllers.register(req, res);
-  case "/trigger":
-    return controllers.trigger(req, res);
-  default:
-    return controllers.notfound(req, res, `Controller not found for requested URL: ${req.url}`);
+    // case "/": req.url += "index.html";
+    case "/": return controllers.redirect(req, res);
+    case "/manifest.json":
+    case "/0.png": case "/1.png": case "/2.png":
+      return controllers.file(req, res);
+    case "/main.js":
+      return controllers.mainjs(req, res);
+    case "/firebase-messaging-sw.js":
+      return controllers.serviceworker(req, res);
+    case "/register":
+      return controllers.register(req, res);
+    case "/trigger":
+      return controllers.trigger(req, res);
+    default:
+      return controllers.notfound(req, res, `Controller not found for requested URL: ${req.url}`);
   }
 });
 
