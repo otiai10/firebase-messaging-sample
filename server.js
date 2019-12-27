@@ -11,6 +11,7 @@ const mimeTypes = {
   html: "text/html",
   js:   "text/javascript",
   png:  "image/png",
+  json: "application/json",
 };
 
 const storage = [];
