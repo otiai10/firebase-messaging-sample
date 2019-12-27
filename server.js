@@ -1,5 +1,10 @@
 /**
- *
+ * This script represents server-side of your application,
+ * supposed to
+ *     1. Render client-side HTML/JavaScript for browsers
+ *     2. Accept HTTP request from the clients and send it forward to FCM (see `/trigger` endpoint)
+ * As you may know, it DOESN'T have to be Node.js,
+ * you can write your server with whatever you like.
  */
 
 const http  = require("http"),
@@ -14,7 +19,12 @@ const mimeTypes = {
   json: "application/json",
 };
 
-const storage = [];
+/**
+ * This "subscribers" object represents all the clients who allow push-notification
+ * and send their subscription tokens.
+ * In production environment, of course, this should NOT be on memory.
+ */
+const subscribers = [];
 
 const controllers = {
   // `notfound` just handles case 404
@@ -46,10 +56,10 @@ const controllers = {
     req.on("data", chunk => body.push(chunk));
     req.on("end", () => {
       body = JSON.parse(Buffer.concat(body).toString());
-      storage.push(body);
+      subscribers.push(body);
       res.writeHead(200, {"Content-Type": "application/json"});
       res.end(JSON.stringify(body));
-      console.log(storage);
+      console.log("Subscribers:", subscribers);
     });
   },
   trigger: (req, res) => {
@@ -58,7 +68,7 @@ const controllers = {
       "body":  "Hey, what's up doing?",
       "icon":  `/${Math.floor(Math.random(2))}.png`,
     };
-    Promise.all(storage.map(user => {
+    Promise.all(subscribers.map(subscriber => {
       return new Promise((resolve, reject) => {
         https.request({
           method:"POST", host: "fcm.googleapis.com", path: "/fcm/send",
@@ -72,7 +82,7 @@ const controllers = {
           response.on("data", chunk => data.push(chunk))
           response.on("end",  ()    => resolve(JSON.parse(Buffer.concat(data).toString())));
           response.on("error", err  => reject(err));
-        }).end(JSON.stringify({notification, to: user.token, content_available: true}));
+        }).end(JSON.stringify({notification, to: subscriber.token, content_available: true}));
       });
     })).then(result => {
       res.writeHead(200);
